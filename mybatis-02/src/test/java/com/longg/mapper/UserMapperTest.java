@@ -1,4 +1,4 @@
-package com.longg.dao;
+package com.longg.mapper;
 
 import com.longg.pojo.User;
 import com.longg.utils.MybatisUtils;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author long
  * @date 2020/9/16
  */
-public class UserDaoTest {
+public class UserMapperTest {
     @Test
     public void test(){
 
@@ -31,7 +31,7 @@ public class UserDaoTest {
         /**
          * 方式二: 官方不推荐
          */
-        List<User> userList2 = sqlSession.selectList("com.longg.dao.UserMapper.getUserList");
+//        List<User> userList2 = sqlSession.selectList("com.com.longg.dao.UserMapper.getUserList");
 
         for (User user : userList) {
             System.out.println(user);
@@ -94,34 +94,5 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
-    @Test
-    public void addUserMap(){
-        SqlSession sqlSession = MybatisUtils.getSqlSession();
 
-        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("userId",6);
-        map.put("userName","long");
-        map.put("password","123456");
-
-        mapper.addUserMap(map);
-
-        sqlSession.commit();
-        sqlSession.close();
-    }
-
-    @Test
-    public void getUserLike() {
-        SqlSession sqlSession = MybatisUtils.getSqlSession();
-
-        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-        //List<User> users = mapper.getUserLike("%李%");
-        List<User> userlist = mapper.getUserLike("龙");
-        for (User user : userlist) {
-            System.out.println(user);
-        }
-
-        sqlSession.close();
-    }
 }
