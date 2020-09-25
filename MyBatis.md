@@ -1,3 +1,5 @@
+
+
 # MyBatis
 
 **环境：**
@@ -82,6 +84,8 @@ Github：https://github.com/mybatis/mybatis-3
 ----
 
 ## 2. 第一个MyBatis程序
+
+==【工程1：mybatis-01】==
 
 ### 2.1 编写配置文件
 
@@ -304,6 +308,8 @@ public class UserDaoTest {
 
 ## 3. CRUD
 
+==【工程1：mybatis-01】==
+
 ### 3.1 select
 
 选择、查询语句；
@@ -378,7 +384,7 @@ public class UserDaoTest {
            System.out.println("插入成功！");
        }
    
-       // 提交事务
+       // 提交事务（手动）
        sqlSession.commit();
    
        sqlSession.close();
@@ -568,6 +574,8 @@ public void getUserLike() {
 ----
 
 ## 4. 配置解析
+
+==【工程2：mybatis-02】==
 
 ### 4.1 核心配置文件
 
@@ -860,7 +868,9 @@ password = 123456
 
 ----
 
-## 5.解决属性名与字段名不一致的问题
+## 5. 解决属性名与字段名不一致的问题
+
+==【工程3：mybatis-03】==
 
 数据库中的字段：
 
@@ -959,6 +969,8 @@ sql语句：
 ----
 
 ## 6. 日志
+
+==【工程4：mybatis-04】==
 
 ### 6.1 日志工厂
 
@@ -1073,11 +1085,388 @@ logger.error("error:进入了testlog4j");
 
 ![image-20200924192515378](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200924192515378.png)
 
+----
+
+## 7. 分页
+
+==【工程4：mybatis-04】==
+
+思考：为什么要分页？
+
+- 减少数据的处理量；
 
 
 
+### 7.1 Limit分页的方法
+
+- 传统使用Limit分页：
+
+```sql
+语法：select * from user limit startIndex,PageSize;
+select * from user limit 2,3;
+```
+
+- 使用MyBatis实现分页，核心为SQL；
+
+  - 接口
+
+  ```java
+  /**
+    * 分页查询
+    */
+  List<User> getUserLimit(Map<String ,Integer> map);
+  ```
+
+  - mapper.xml
+
+  ```cml
+  <select id="getUserLimit" resultMap="UserMap" parameterType="map">
+  	select * from user limit #{startIndex},#{pageSize};
+  </select>
+  ```
+
+  - 测试
+
+  ```java
+  @Test
+  public void getUserLimit(){
+      SqlSession sqlSession = MybatisUtils.getSqlSession();
+  
+      UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+      HashMap<String, Integer> map = new HashMap<String, Integer>();
+      map.put("startIndex",2);
+      map.put("pageSize",3);
+      List<User> users = mapper.getUserLimit(map);
+      for (User user : users) {
+          System.out.println(user);
+      }
+  
+      sqlSession.close();
+  }
+  ```
+
+### 7.2 RowBounds分页的方法
+
+不再使用SQL实现分页，在Java层实现分页
+
+- 接口
+
+```xml
+/**
+  * 分页查询:RowBounds
+  */
+List<User> getUserRowBounds();
+```
+
+- mapper.xml
+
+```xml
+<select id="getUserRowBounds" resultMap="UserMap" >
+    select * from user ;
+</select>
+```
+
+- 测试
+
+```java
+@Test
+public void getUserRowBounds(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    // RowBounds实现分页
+    RowBounds rowBounds = new RowBounds(2, 3);
+
+    List<User> users = sqlSession.selectList("com.longg.mapper.UserMapper.getUserRowBounds",null,rowBounds);
+
+    for (User user : users) {
+        System.out.println(user);
+    }
+
+    sqlSession.close();
+}
+```
+
+### 7.3 分页插件
+
+![image-20200925100614939](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925100614939.png)
+
+----
+
+## 8. 注解开发
+
+==【工程5：mybatis-05】==
+
+### 8.1 面向接口编程
+
+**关于接口的理解**
+
+- 接口从更深层次的理解，应是定义(规范，约束)与实现(名实分离的原则)的分离。
+
+- 接口的本身反映了系统设计人员对系统的抽象理解。
+
+- 接口应有两类:
+  - 第一类是对一个体的抽象，它可对应为一个抽象体(abstract class);
+  - 第二类是对一个体某一方面的抽象，即形成一个抽象面(interface);
+- 一个体有可能有多个抽象面。抽象体与抽象面是有区别的。
+
+**三个面向的区别**
+
+- **面向对象**是指，我们考虑问题时，以对象为单位，考虑它的属性及方法
+
+- **面向过程**是指，我们考虑问题时，以一个具体的流程(事务过程)为单位，考虑它的实现
+
+- **接口设计与非接口设计**是针对复用技术而言的，与面向对象(过程)不是一个问题
+
+### 8.2 使用注解开发
+
+1. 注解在接口上实现；
+
+```java
+public interface UserMapper {
+
+    /**
+     * 查询全部用户
+     */
+    @Select("select * from user")
+    List<User> getUsers();
+
+}
+```
+
+2. 需要在核心配置文件中绑定接口；
+
+```xml
+<!--绑定接口-->
+<mappers>
+    <mapper class="com.longg.mapper.UserMapper"/>
+</mappers>
+```
+
+3. 测试使用
+
+```java
+@Test
+public void getUsers(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    // 底层主要运用反射
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<User> users = mapper.getUsers();
+    for (User user : users) {
+        System.out.println(user);
+    }
+
+    sqlSession.close();
+}
+```
 
 
+
+- #### **本质：**反射机制实现；
+
+- #### **底层：**动态代理；
+
+
+
+### ==MyBatis详细的执行流程：==
+
+  ![image-20200925141244885](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925141244885.png)
+
+### 8.3 自动提交事务
+
+​       **==在MyBatis工具类MyBatisUtils中的实例化SqlSession的getSqlSession()方法中加上  `true`  即可自动提交事务，不用在执行SQL语句之后再手动提交事务，但是通常情况下不推荐使用自动提交事务的方法；==**         **<u>可对比3.2-3.4节的代码</u>**
+
+​	   **手动提交事务：**工具类和测试类
+
+![image-20200925152011848](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925152011848.png)
+
+![image-20200925152055410](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925152055410.png)
+
+​		**自动提交事务：**工具类和测试类
+
+![image-20200925152152735](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925152152735.png)
+
+![image-20200925152225844](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925152225844.png)
+
+
+
+### 8.4 使用注解实现CRUD开发
+
+- ##### 编写接口,增加注解（增删改查）
+
+```java
+public interface UserMapper {
+
+    /**
+     * 使用注解查询全部用户
+     */
+    @Select("select * from user")
+    List<User> getUsers();
+
+    /**
+     * 使用注解根据id查询用户，参数获取使用注解 @Param("userId")；
+     * SQL语句中的 id = #{userId} 部分的“userId”参数由注解 @Param("userId")装配；
+     * 如果方法存在多个参数，则在所有的参数前面使用注解 @Param(" ") 即可；
+     */
+    @Select("select * from user where id = #{userId};")
+    User getUserById(@Param("userId") int id);
+
+    /**
+     * 使用注解插入对象
+     */
+    @Insert("insert into user(id,name,pwd) values (#{id},#{name},#{password})")
+    int insertUser(User user);
+
+    /**
+     * 使用注解修改用户
+     */
+    @Update("update user set name = #{name},pwd = #{password} where id = #{id};")
+    int updateUser(User user);
+
+    /**
+     * 使用注解删除用户
+     */
+    @Delete("delete from user where id = #{id};")
+    int deleteUser(@Param("id") int id);
+
+}
+```
+
+**关于@Param(" ")注解说明**
+
+- 基本类型的参数或者String类型，需要加上；【如上例代码中的“int"类型】
+- 引用类型不需要加；   【如上例中的”User"类型】
+- 如果只有一个基本类型的话，可以忽略，但是建议加上；
+- 如果方法存在多个参数，则在所有的参数前面使用注解 @Param(" ") 即可；
+- 上述查询 SQL语句中的 id = #{userId} 部分的“userId”参数由注解 @Param("userId")装配；
+
+
+
+- ##### 测试实现
+
+```java
+public class UserMapperTest {
+
+    @Test
+    public void getUsers(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+        // 底层主要运用反射
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        List<User> users = mapper.getUsers();
+        for (User user : users) {
+            System.out.println(user);
+        }
+
+        sqlSession.close();
+    }
+
+    @Test
+    public void getUserById(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        System.out.println(mapper.getUserById(2));
+
+        sqlSession.close();
+    }
+
+    @Test
+    public void insertUser(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        System.out.println(mapper.insertUser(new User(8,"longlong","6666")));
+
+        sqlSession.close();
+    }
+
+    @Test
+    public void updateUser(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        System.out.println(mapper.updateUser(new User(8,"long","66668888")));
+
+        sqlSession.close();
+    }
+
+    @Test
+    public void deleteUser(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        System.out.println(mapper.deleteUser(4));
+
+        sqlSession.close();
+    }
+
+}
+```
+
+- ##### 注意：必须将我们的接口类注册绑定到配置文件中，详见8.1节
+
+----
+
+## 9. LomBok
+
+==【工程6：mybatis-06】==
+
+​		**Lombok项目是一个Java库，它会自动插入编辑器和构建工具中，Lombok提供了一组有用的注释，用来消除Java类中的大量样板代码。仅五个字符(@Data)就可以替换数百行代码从而产生干净，简洁且易于维护的 Java 类。**
+
+### 9.1 常用注解
+
+- @Setter ：注解在类或字段，注解在类时为所有字段生成setter方法，注解在字段上时只为该字段生成setter方法。
+
+- @Getter ：使用方法同上，区别在于生成的是getter方法。
+
+- @ToString ：注解在类，添加toString方法。
+
+- @EqualsAndHashCode： 注解在类，生成hashCode和equals方法。
+
+- ==@NoArgsConstructor： 注解在类，生成无参的构造方法。==
+
+- @RequiredArgsConstructor： 注解在类，为类中需要特殊处理的字段生成构造方法，比如final和被@NonNull注解的字段。
+
+- ==@AllArgsConstructor： 注解在类，生成包含类中所有字段的构造方法。==
+
+- ==@Data： 注解在类，生成无参构造方法、setter/getter、equals、canEqual、hashCode、toString方法，如为final属性，则不会为该属性生成setter方法。==【最重要】
+
+- @Slf4j： 注解在类，生成log变量，严格意义来说是常量。
+
+### 9.2 使用Lombok的步骤
+
+1. 在 IDEA 中安装对应的插件
+2. 在项目的pom文件中导入Lombok的jar包
+
+```xml
+<dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+  <version>1.18.12</version>
+</dependency>
+```
+
+3. 在实体类上添加其注解
+
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User {
+
+    private int id;
+    private String name;
+    private String password;
+
+}
+```
+
+![image-20200925163914693](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200925163914693.png)
+
+----
+
+## 10. 
 
 
 

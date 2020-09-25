@@ -13,6 +13,10 @@ import java.util.List;
  * @date 2020/9/16
  */
 public class UserDaoTest {
+
+    /**
+     * 测试使用Mybatis  对应 2.第一个MyBatis程序
+     */
     @Test
     public void test(){
 
@@ -43,6 +47,9 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
+    /**
+     * 测试使用根据id查询  对应 3.CRUD
+     */
     @Test
     public void getUserById(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -54,6 +61,9 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
+    /**
+     * 测试使用插入记录  对应 3.CRUD
+     */
     @Test
     public void addUser(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -70,6 +80,9 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
+    /**
+     * 测试使用修改用户  对应 3.CRUD
+     */
     @Test
     public void updateUser(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -82,6 +95,9 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
+    /**
+     * 测试使用删除数据  对应 3.CRUD
+     */
     @Test
     public void deleteUser(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -94,6 +110,9 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
+    /**
+     * 测试使用Map  对应 3.CRUD
+     */
     @Test
     public void addUserMap(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -111,6 +130,9 @@ public class UserDaoTest {
         sqlSession.close();
     }
 
+    /**
+     * 测试使用模糊查询  对应 3.CRUD
+     */
     @Test
     public void getUserLike() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();

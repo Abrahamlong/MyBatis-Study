@@ -15,4 +15,12 @@
         select * from mybatis.user where id = #{id};
     </select>
 
+    <select id="getUserLimit" resultMap="UserMap" parameterType="map">
+        select * from user limit #{startIndex},#{pageSize};
+    </select>
+
+    <select id="getUserRowBounds" resultMap="UserMap" >
+        select * from user ;
+    </select>
+
 </mapper>

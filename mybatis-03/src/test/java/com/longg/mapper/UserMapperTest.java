@@ -13,6 +13,9 @@ import java.util.List;
  */
 public class UserMapperTest {
 
+    /**
+     * 测试解决实体类属性名与数据库字段名不一致的问题  对应 5.解决属性名与字段名不一致的问题
+     */
     @Test
     public void getUserById(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
