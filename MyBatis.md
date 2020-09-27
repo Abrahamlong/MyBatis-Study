@@ -112,7 +112,7 @@ Github：https://github.com/mybatis/mybatis-3
     </environments>
     <!--每一个Mapper.xml都需要在Mabatis的核心配置文件中注册-->
     <mappers>
-        <com.longg.mapper resource="com.com.longg.dao.UserMapper.xml"/>
+        <mapper resource="com.longg.dao.UserMapper.xml"/>
     </mappers>
 
 </configuration>
@@ -218,16 +218,16 @@ public interface UserMapper {
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE com.longg.mapper
+<!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-com.longg.mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--namespace 绑定一个对应的Dao/Mapper接口-->
-<com.longg.mapper namespace="com.com.longg.dao.UserMapper">
+<mapper namespace="com.longg.dao.UserMapper">
 
-    <select id="getUserList" resultType="com.com.longg.pojo.User">
+    <select id="getUserList" resultType="com.longg.pojo.User">
         select * from mybatis.user;
     </select>
-</com.longg.mapper>
+</mapper>
 ```
 
 - 测试类
@@ -332,7 +332,7 @@ public class UserDaoTest {
 2. ##### 编写对应的mapper中的sql语句；
 
    ```xml
-   <select id="getUserById" parameterType="int" resultType="com.com.longg.pojo.User">
+   <select id="getUserById" parameterType="int" resultType="com.longg.pojo.User">
        select * from mybatis.user where id = #{id};
    </select>
    ```
@@ -344,8 +344,8 @@ public class UserDaoTest {
    public void getUserById(){
        SqlSession sqlSession = MybatisUtils.getSqlSession();
    
-       UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
-       User user = com.longg.mapper.getUserById(1);
+       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+       User user = mapper.getUserById(1);
        System.out.println(user);
    
        sqlSession.close();
@@ -366,7 +366,7 @@ public class UserDaoTest {
 2. ##### 编写对应的mapper中的sql语句；
 
    ```xml
-   <insert id="addUser" parameterType="com.com.longg.pojo.User">
+   <insert id="addUser" parameterType="com.longg.pojo.User">
        insert into mybatis.user (id,name,pwd) values (#{id},#{name},#{pwd});
    </insert>
    ```
@@ -378,8 +378,8 @@ public class UserDaoTest {
    public void addUser(){
        SqlSession sqlSession = MybatisUtils.getSqlSession();
    
-       UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
-       int result = com.longg.mapper.addUser(new User(6, "long", "123456"));
+       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+       int result = mapper.addUser(new User(6, "long", "123456"));
        if(result > 0) {
            System.out.println("插入成功！");
        }
@@ -405,7 +405,7 @@ public class UserDaoTest {
 2. ##### 编写对应的mapper中的sql语句；
 
    ```xml
-   <update id="updateUser" parameterType="com.com.longg.pojo.User">
+   <update id="updateUser" parameterType="com.longg.pojo.User">
        update mybatis.user set name = #{name},pwd=#{pwd} where id=#{id};
    </update>
    ```
@@ -417,8 +417,8 @@ public class UserDaoTest {
    public void updateUser(){
        SqlSession sqlSession = MybatisUtils.getSqlSession();
    
-       UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
-       com.longg.mapper.updateUser(new User(4,"hhh","654321"));
+       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+       mapper.updateUser(new User(4,"hhh","654321"));
    
        sqlSession.commit();
    
@@ -452,8 +452,8 @@ public class UserDaoTest {
    public void deleteUser(){
        SqlSession sqlSession = MybatisUtils.getSqlSession();
    
-       UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
-       com.longg.mapper.deleteUser(6);
+       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+       mapper.deleteUser(6);
    
        sqlSession.commit();
    
@@ -485,14 +485,14 @@ int addUserMap(Map<String ,Object> map);
 public void addUserMap(){
     SqlSession sqlSession = MybatisUtils.getSqlSession();
 
-    UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
 
     HashMap<String, Object> map = new HashMap<String, Object>();
     map.put("userId",6);
     map.put("userName","long");
     map.put("password","123456");
 
-    com.longg.mapper.addUserMap(map);
+    mapper.addUserMap(map);
 
     sqlSession.commit();
     sqlSession.close();
@@ -521,7 +521,7 @@ List<User> getUserLike(String str);
 ```
 
 ```xml
-<select id="getUserLike" resultType="com.com.longg.pojo.User">
+<select id="getUserLike" resultType="com.longg.pojo.User">
     select * from user where name like #{value};
 </select>
 ```
@@ -531,8 +531,8 @@ List<User> getUserLike(String str);
 public void getUserLike() {
     SqlSession sqlSession = MybatisUtils.getSqlSession();
 
-    UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
-    List<User> users = com.longg.mapper.getUserLike("%李%");
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<User> users = mapper.getUserLike("%李%");
     for (User user : users) {
         System.out.println(user);
     }
@@ -551,7 +551,7 @@ List<User> getUserLike(String str);
 ```
 
 ```xml
-<select id="getUserLike" resultType="com.com.longg.pojo.User">
+<select id="getUserLike" resultType="com.longg.pojo.User">
     select * from user where name like "%"#{value}"%";
 </select>
 ```
@@ -561,8 +561,8 @@ List<User> getUserLike(String str);
 public void getUserLike() {
     SqlSession sqlSession = MybatisUtils.getSqlSession();
 
-    UserMapper com.longg.mapper = sqlSession.getMapper(UserMapper.class);
-    List<User> users = com.longg.mapper.getUserLike("龙");
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<User> users = mapper.getUserLike("龙");
     for (User user : users) {
         System.out.println(user);
     }
@@ -673,7 +673,7 @@ password = 123456
     </environments>
 
     <mappers>
-        <com.longg.mapper resource="com/com.longg/com.longg.mapper/UserMapper.xml"/>
+        <mapper resource="com/longg/mapper/UserMapper.xml"/>
     </mappers>
     
 </configuration>
@@ -690,7 +690,7 @@ password = 123456
     ```xml
     <!--可以给实体类取别名-->
     <typeAliases>
-        <typeAlias type="com.com.longg.pojo.User" alias="User"/>
+        <typeAlias type="com.longg.pojo.User" alias="User"/>
     </typeAliases>
     ```
 
@@ -705,7 +705,7 @@ password = 123456
     ```xml
     <!--给对应的包取别名-->
     <typeAliases>
-        <package name="com.com.longg.pojo"/>
+        <package name="com.longg.pojo"/>
     </typeAliases>
     ```
 
@@ -799,7 +799,7 @@ password = 123456
 
 例：    
 <mappers>
-    <com.longg.mapper resource="com/com.longg/com.longg.mapper/UserMapper.xml"/>
+    <com.longg.mapper resource="com/longg/mapper/UserMapper.xml"/>
 </mappers>
 ```
 
@@ -808,14 +808,14 @@ password = 123456
 ```xml
 <!-- 使用映射器接口实现类的完全限定类名 -->
 <mappers>
-  <com.longg.mapper class="org.mybatis.builder.AuthorMapper"/>
-  <com.longg.mapper class="org.mybatis.builder.BlogMapper"/>
-  <com.longg.mapper class="org.mybatis.builder.PostMapper"/>
+  <mapper class="org.mybatis.builder.AuthorMapper"/>
+  <mapper class="org.mybatis.builder.BlogMapper"/>
+  <mapper class="org.mybatis.builder.PostMapper"/>
 </mappers>
 
 例：
 <mappers>
-    <com.longg.mapper class="com.com.longg.com.longg.mapper.UserMapper"/>
+    <mapper class="com.longg.mapper.UserMapper"/>
 </mappers>
 ```
 
@@ -834,14 +834,14 @@ password = 123456
 
 例：
 <mappers>
-    <package name="com.com.longg.com.longg.mapper"/>
+    <package name="com.longg.mapper"/>
 </mappers>
 ```
 
 **注意点：**
 
   		1. 接口和它的Mapper配置文件必须同名；
-        		2. 接口和它的Mapper配置文件必须在同一个包下；
+                		2. 接口和它的Mapper配置文件必须在同一个包下；
 
 ### 4.7 作用域（Scope）和生命周期
 
@@ -1466,7 +1466,641 @@ public class User {
 
 ----
 
-## 10. 
+## 10. 多对一情况处理
+
+==【工程7：mybatis-07】==
+
+**测试环境搭建**
+
+1. 导入Lombok；
+2. 新建实体类：Teacher、Student；
+
+```java
+@Data
+public class Student {
+    private int id;
+    private String name;
+    
+    /**
+     * 学生对应的老师对象
+     */
+    private Teacher teacher;
+}
+```
+
+```java
+@Data
+public class Teacher {
+    private int id;
+    private String name;
+}
+```
+
+3. 建立Mapper接口；
+
+4. 建立Mapper.xml文件；
+
+5. 在核心配置文件中绑定注册我们的mapper接口或文件；
+
+6. 测试查询是否成功；
+
+### 10.1 按照查询嵌套处理
+
+**==类似于Sql中的子查询：==**
+
+mapper.xml文件：
+
+```xml
+<select id="getStudent" resultMap="StudentAndTeacher">
+    select * from student;
+</select>
+
+<resultMap id="StudentAndTeacher" type="Student">
+    <result property="id" column="id"/>
+    <result property="name" column="name"/>
+    <!--
+        复杂的属性需要单独处理
+        对象：association
+        集合：collection
+    -->
+    <association property="teacher" column="teacher_id" javaType="Teacher" select="getTeacher"/>
+</resultMap>
+
+<select id="getTeacher" resultType="Teacher">
+    select * from teacher where id = #{teacher_id};
+</select>
+```
+
+结果展示：
+
+![image-20200927100608412](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927100608412.png)
+
+### 10.2 按照结果嵌套处理
+
+**==类似于Sql中的嵌套查询：==**
+
+mapper.xml文件：
+
+```xml
+<select id="getStudent2" resultMap="StudentAndTeacher2">
+    select s.id sId, s.name sName, t.name tName
+    from teacher t, student s
+    where s.teacher_id = t.id;
+</select>
+
+<resultMap id="StudentAndTeacher2" type="Student">
+    <result property="id" column="sId"/>
+    <result property="name" column="sName"/>
+    <!--
+        复杂的属性需要单独处理
+        对象：association
+        集合：collection
+    -->
+    <association property="teacher" javaType="Teacher">
+        <result property="name" column="tName"/>
+    </association>
+</resultMap>
+```
+
+结果展示：
+
+![image-20200927100513651](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927100513651.png)
+
+-----
+
+## 11. 一对多情况处理
+
+==【工程8：mybatis-08】==
+
+**测试环境搭建**
+
+1. 导入Lombok；
+2. 新建实体类：Teacher、Student；
+
+```java
+@Data
+public class Student {
+    private int id;
+    private String name;
+    private int teacherId;
+}
+```
+
+```java
+@Data
+public class Teacher {
+    private int id;
+    private String name;
+
+    /**
+     * 一个老师拥有多个学生
+     */
+    private List<Student> students;
+}
+```
+
+3. 建立Mapper接口；
+
+4. 建立Mapper.xml文件；
+
+5. 在核心配置文件中绑定注册我们的mapper接口或文件；
+
+6. 测试查询是否成功；
+
+### 11.1 按照结果嵌套查询
+
+**==类似于Sql中的嵌套查询：==**
+
+mapper.xml文件：
+
+```xml
+<select id="getTeacherStudent" resultMap="TeacherAndStudent">
+    select s.id sId, s.name sName, t.name tName, t.id tId
+    from teacher t, student s
+    where s.teacher_id = t.id ;
+</select>
+
+<resultMap id="TeacherAndStudent" type="Teacher">
+    <result column="tId" property="id"/>
+    <result column="tName" property="name"/>
+    <!--
+        复杂的属性需要单独处理
+        对象：association
+        集合：collection
+        javaType="": 为指定属性的类型
+        ofType="": 为集合中的泛型信息
+    -->
+    <collection property="students" ofType="Student">
+        <result property="id" column="sId"/>
+        <result property="name" column="sName"/>
+        <result property="teacherId" column="tId"/>
+    </collection>
+</resultMap>
+```
+
+结果展示：
+
+![image-20200927111734270](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927111734270.png)
+
+### 11.2 按照查询嵌套查询
+
+**==类似于Sql中的子查询：==**
+
+mapper.xml文件：
+
+```xml
+<select id="getTeacherStudent2" resultMap="TeacherAndStudent2">
+    select * from teacher;
+</select>
+
+<resultMap id="TeacherAndStudent2" type="Teacher">
+    <result column="id" property="id"/>
+    <result column="name" property="name"/>
+    <!--
+        复杂的属性需要单独处理
+        对象：association
+        集合：collection
+        javaType="": 为指定属性的类型
+        ofType="": 为集合中的泛型信息
+    -->
+    <collection property="students" javaType="ArrayList" ofType="Student" select="getStudentByTeacherId" column="id"/>
+</resultMap>
+
+<select id="getStudentByTeacherId" resultType="Student">
+    select * from student where teacher_id = #{teacherId};
+</select>
+```
+
+结果展示：
+
+![image-20200927114738803](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927114738803.png)
+
+
+
+### 11.3 小结
+
+1. 关联：association 【多对一】
+2. 集合：collection    【一对多】
+3. javaType & ofType
+   - javaType 用来指定实体类中属性的类型；
+   - ofType 用来指定映射到List或者集合中的pojo类型，泛型中的约束类型；
+
+掌握MySQL的引擎、InnoDB底层原理、索引、索引优化
+
+----
+
+## 12. 动态SQL
+
+==【工程9：mybatis-09】==
+
+- #### **动态 SQL 是 MyBatis 的强大特性之一**！
+
+==**什么是动态SQL：动态SQL就是指根据不同的条件生成不同的SQL语句；**==
+
+如果你之前用过 JSTL 或任何基于类 XML 语言的文本处理器，你对动态 SQL 元素可能会感觉似曾相识。在 MyBatis 之前的版本中，需要花时间了解大量的元素。借助功能强大的基于 OGNL 的表达式，MyBatis 3 替换了之前的大部分元素，大大精简了元素种类，现在要学习的元素种类比原来的一半还要少。
+
+- if
+- choose (when, otherwise)
+- trim (where, set)
+- foreach
+
+**搭建环境**
+
+```sql
+CREATE TABLE blog
+(
+	id varchar(50) NOT NULL COMMENT '博客ID',
+	title varchar(100) NOT NULL COMMENT '博客标题',
+    author varchar(30) NOT NULL COMMENT '博客作者',
+    create_time datetime NOT NULL COMMENT '创建时间',
+    views int(30) NOT NULL COMMENT '浏览量'
+)engine=InnoDB default charset=utf8;
+```
+
+**创建基础工程：**
+
+1. 导入Lombok；
+2. 新建实体类：Blog；
+
+```java
+@Data
+public class Blog {
+    private int id;
+    private String title;
+    private String author;
+    private Date createTime;
+    private int views;
+}
+```
+
+3. 建立Mapper接口；
+
+4. 建立Mapper.xml文件；
+
+   ````xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+           PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <mapper namespace="com.longg.mapper.BlogMapper">
+   
+   
+   </mapper>
+   ````
+
+5. 在核心配置文件中绑定注册我们的mapper接口或文件；
+
+### 12.1 IF
+
+官网：
+
+![image-20200927170736261](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927170736261.png)
+
+mapper.xml：
+
+```xml
+<select id="queryBlogIF" parameterType="map" resultType="Blog">
+    select * from blog where 1=1	/*写 1=1 仅仅只为了拼接and语句*/
+    <if test="title != null">
+    	and title = #{title}
+    </if>
+    <if test="author != null">
+    	and author = #{author}
+    </if>
+</select>
+```
+
+测试类：
+
+```java
+@Test
+public void queryBlogIF(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
+
+    HashMap map = new HashMap();
+    map.put("title","Java如此简单");
+    map.put("author","long");
+
+    List<Blog> blogs = mapper.queryBlogIF(map);
+    for (Blog blog : blogs) {
+        System.out.println(blog);
+    }
+
+    sqlSession.close();
+}
+```
+
+结果：
+
+![image-20200927183655328](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927183655328.png)
+
+注释map.put("title","Java如此简单");的结果：
+
+![image-20200927183737539](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927183737539.png)
+
+### 12.2 choose (when, otherwise)
+
+有时候，我们不想使用所有的条件，而只是想从多个条件中选择一个使用。针对这种情况，MyBatis 提供了` choose` 元素，它有点像 Java 中的 switch 语句。
+
+mapper.xml：
+
+```xml
+<select id="queryBlogChoose" resultType="Blog" parameterType="map">
+    select * from blog where 1=1
+    <choose>
+        <when test="title != null">
+            and title = #{title}
+        </when>
+        <when test="author != null">
+            and author = #{author}
+        </when>
+        <otherwise>
+            and views = #{views}
+        </otherwise>
+    </choose>
+</select>
+```
+
+测试类：
+
+```java
+/**
+  * 测试动态sql的Choose标签
+  */
+@Test
+public void queryBlogChoose(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
+
+    HashMap map = new HashMap();
+    //        map.put("title","Java如此简单");
+    //        map.put("author","long");
+    map.put("views",666);
+
+    List<Blog> blogs = mapper.queryBlogChoose(map);
+    for (Blog blog : blogs) {
+        System.out.println(blog);
+    }
+
+    sqlSession.close();
+}
+```
+
+当map同时给title和author两个参数时，只选择第一个 `when` 中的语句执行，结果如下：
+
+![image-20200927184747072](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927184747072.png)
+
+当map只给title和author两个参数中的一个时，选择对应的 `when `中的语句执行，结果如下：
+
+![image-20200927185035061](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927185035061.png)
+
+![image-20200927185058017](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927185058017.png)
+
+当map不给参数参数时，choose会选择执行最后的 `otherwise` 中的语句执行，结果如下：(如果不给views参数则查询为空)
+
+![image-20200927185155849](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927185155849.png)
+
+![image-20200927185304638](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927185304638.png)
+
+### 12.3 trim (where, set)
+
+- ##### `where ` 元素只会在子元素返回任何内容的情况下才插入 “where” 子句。而且，若子句的开头为 “AND” 或 “OR”，*`where`* 元素也会将它们去除。不需要用“1=1”来拼接where语句了
+
+mapper.xml：
+
+```xml
+    <select id="queryBlogWhere" resultType="Blog" parameterType="map">
+        select * from blog
+        <where>
+            <if test="title != null">
+                and title = #{title}
+            </if>
+            <if test="author != null">
+                and author = #{author}
+            </if>
+        </where>
+    </select>
+```
+
+测试类：
+
+```java
+/**
+  * 测试动态sql的where标签
+  */
+@Test
+public void queryBlogWhere(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
+
+    HashMap map = new HashMap();
+    map.put("title","Java如此简单");
+    map.put("author","long");
+
+    List<Blog> blogs = mapper.queryBlogWhere(map);
+    for (Blog blog : blogs) {
+        System.out.println(blog);
+    }
+
+    sqlSession.close();
+}
+```
+
+两个条件均成立的情况，结果如下：
+
+![image-20200927190030213](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927190030213.png)
+
+两个条件均不成立的情况，结果如下：
+
+![image-20200927190001951](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927190001951.png)
+
+- ##### 用于动态更新语句的类似于 `where` 标签的解决方案叫做  *`set`*。*`set`* 元素可以用于动态包含需要更新的列，忽略其它不更新的列;
+
+mapper.xml：
+
+```xml
+<update id="updateBlogSet" parameterType="map">
+    update blog
+    <set>
+        <if test="title != null">
+            title = #{title},
+        </if>
+        <if test="author != null">
+            author = #{author}
+        </if>
+    </set>
+    where id = #{id}
+</update>
+```
+
+测试类：
+
+```java
+/**
+  * 测试动态sql的set标签
+  */
+@Test
+public void updateBlogSet(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
+
+    HashMap map = new HashMap();
+    map.put("title","Java如此简单2");
+    map.put("author","long2");
+    map.put("id","ebceb80b40ef4027af8d6ff9a72c756e");
+
+    mapper.updateBlogSet(map);
+
+    sqlSession.close();
+}
+```
+
+两个条件均成立的情况，结果如下：
+
+![image-20200927190926987](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927190926987.png)
+
+只有第一个条件均成立的情况，结果如下：
+
+![image-20200927190905987](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927190905987.png)
+
+- ##### 也可以通过自定义 trim 元素来定制 *`where`* 元素和 *`set`* 元素的功能
+
+```xml
+<trim prefix="WHERE" prefixOverrides="AND |OR ">
+  ...
+</trim>
+```
+
+```xml
+<trim prefix="SET" suffixOverrides=",">
+  ...
+</trim>
+```
+
+### 12.4 Foreach
+
+- ##### 动态 SQL 的另一个常见使用场景是对集合进行遍历（尤其是在构建 IN 条件语句的时候）
+
+- ##### *`foreach`* 元素的功能非常强大，它允许你指定一个集合，声明可以在元素体内使用的集合项（item）和索引（index）变量。它也允许你指定开头与结尾的字符串以及集合项迭代之间的分隔符。这个元素也不会错误地添加多余的分隔符，看它多智能！
+
+- ##### 你可以将任何可迭代对象（如 List、Set 等）、Map 对象或者数组对象作为集合参数传递给 *foreach*。当使用可迭代对象或者数组时，index 是当前迭代的序号，item 的值是本次迭代获取到的元素。当使用 Map 对象（或者 Map.Entry 对象的集合）时，index 是键，item 是值。
+
+mapper.xml：
+
+```xml
+<select id="queryBlogForeach" parameterType="map" resultType="Blog">
+    select * from blog
+    <where>
+        <foreach collection="ids" item="id" open="(" close=")" separator="or">
+            id = #{id}
+        </foreach>
+    </where>
+</select>
+```
+
+测试类：
+
+```java
+/**
+  * 测试使用Foreach
+  */
+@Test
+public void queryBlogForeach(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
+
+    HashMap map = new HashMap();
+
+    ArrayList<Integer> ids = new ArrayList<Integer>();
+    ids.add(1);
+    ids.add(2);
+    ids.add(3);
+
+    map.put("ids",ids);
+
+    List<Blog> blogs = mapper.queryBlogForeach(map);
+    for (Blog blog : blogs) {
+        System.out.println(blog);
+    }
+
+    sqlSession.close();
+}
+```
+
+结果如下：
+
+![image-20200927195424608](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927195424608.png)
+
+
+
+### 12.5 SQL片段
+
+- ##### 有时候，我们可能会将以一些功能的部分抽取出来，实现SQL的复用；
+
+- ##### ==用法：==使用SQL标签抽取公共部分，在需要使用的地方使用include标签引用即可；
+
+- ##### 注意事项：最好基于单表来定义SQL片段；不要存在where标签；
+
+mapper.xml：
+
+```xml
+<select id="queryBlogSQL" resultType="Blog" parameterType="map">
+    select * from blog
+    <where>
+        <include refid="if-title-author"></include>
+    </where>
+</select>
+
+<sql id="if-title-author">
+    <if test="title != null">
+        and title = #{title}
+    </if>
+    <if test="author != null">
+        and author = #{author}
+    </if>
+</sql>
+```
+
+测试类：
+
+```java
+/**
+  * 测试使用动态SQL片段拼接SQL语句
+  */
+@Test
+public void queryBlogSQL(){
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+    BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
+
+    HashMap map = new HashMap();
+    map.put("title","Java如此简单");
+    map.put("author","long");
+
+    List<Blog> blogs = mapper.queryBlogSQL(map);
+    for (Blog blog : blogs) {
+        System.out.println(blog);
+    }
+
+    sqlSession.close();
+}
+```
+
+结果如下：
+
+![image-20200927192508464](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927192508464.png)
+
+
+
+
+
+
 
 
 

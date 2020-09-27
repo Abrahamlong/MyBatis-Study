@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.longg.mapper.TeacherMapper">
+
+    <select id="getTeacher" resultType="Teacher">
+        select * from teacher;
+    </select>
+
+    <select id="getTeacherStudent1" resultMap="TeacherAndStudent">
+        select s.id sId, s.name sName, t.name tName, t.id tId
+        from teacher t, student s
+        where s.teacher_id = t.id ;
+    </select>
+
+    <resultMap id="TeacherAndStudent" type="Teacher">
+        <result column="tId" property="id"/>
+        <result column="tName" property="name"/>
+        <!--
+            复杂的属性需要单独处理
+            对象：association
+            集合：collection
+            javaType="": 为指定属性的类型
+            ofType="": 为集合中的泛型信息
+        -->
+        <collection property="students" ofType="Student">
+            <result property="id" column="sId"/>
+            <result property="name" column="sName"/>
+            <result property="teacherId" column="tId"/>
+        </collection>
+    </resultMap>
+
+    <!--========================================================================================-->
+
+    <select id="getTeacherStudent2" resultMap="TeacherAndStudent2">
+        select * from teacher;
+    </select>
+
+    <resultMap id="TeacherAndStudent2" type="Teacher">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <!--
+            复杂的属性需要单独处理
+            对象：association
+            集合：collection
+            javaType="": 为指定属性的类型
+            ofType="": 为集合中的泛型信息
+        -->
+        <collection property="students" javaType="ArrayList" ofType="Student" select="getStudentByTeacherId" column="id"/>
+    </resultMap>
+
+    <select id="getStudentByTeacherId" resultType="Student">
+        select * from student where teacher_id = #{teacherId};
+    </select>
+</mapper>

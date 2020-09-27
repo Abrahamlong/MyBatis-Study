@@ -10,9 +10,5 @@ import lombok.Data;
 public class Student {
     private int id;
     private String name;
-
-    /**
-     * 学生对应的老师对象
-     */
-    private Teacher teacher;
+    private int teacherId;
 }

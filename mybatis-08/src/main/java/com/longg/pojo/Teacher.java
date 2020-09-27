@@ -2,17 +2,19 @@ package com.longg.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author long
  * @date 2020/9/25
  */
 @Data
-public class Student {
+public class Teacher {
     private int id;
     private String name;
 
     /**
-     * 学生对应的老师对象
+     * 一个老师拥有多个学生
      */
-    private Teacher teacher;
+    private List<Student> students;
 }
