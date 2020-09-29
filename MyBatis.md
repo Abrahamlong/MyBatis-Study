@@ -1990,7 +1990,7 @@ public void updateBlogSet(){
 
 - ##### 你可以将任何可迭代对象（如 List、Set 等）、Map 对象或者数组对象作为集合参数传递给 *foreach*。当使用可迭代对象或者数组时，index 是当前迭代的序号，item 的值是本次迭代获取到的元素。当使用 Map 对象（或者 Map.Entry 对象的集合）时，index 是键，item 是值。
 
-mapper.xml：
+mapper.xml：（map传参）
 
 ```xml
 <select id="queryBlogForeach" parameterType="map" resultType="Blog">
@@ -2037,7 +2037,42 @@ public void queryBlogForeach(){
 
 ![image-20200927195424608](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927195424608.png)
 
+mapper.xml：（int数组传参）
 
+```xml
+<select id="queryBlogForeach" parameterType="int[]" resultType="Blog">
+    select * from blog
+    <where>
+        <foreach collection="array" item="id" open="(" close=")" separator="or">
+            id = #{id}
+        </foreach>
+    </where>
+</select>
+```
+
+mapper.xml：（List传参）
+
+```xml
+<select id="queryBlogForeach" parameterType="list" resultType="Blog">
+    select * from blog
+    <where>
+        <foreach collection="list" item="id" open="(" close=")" separator="or">
+            id = #{id}
+        </foreach>
+    </where>
+</select>
+```
+
+mapper.xml：（List传参, SQL为in语句）
+
+```xml
+<select id="queryBlogForeach" parameterType="list" resultType="Blog">
+    select * from blog where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+</select>
+```
 
 ### 12.5 SQL片段
 
@@ -2096,11 +2131,109 @@ public void queryBlogSQL(){
 
 ![image-20200927192508464](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200927192508464.png)
 
+----
 
+## 13. 缓存
 
+### 13.1 MyBatis缓存
 
+- MyBatis 内置了一个强大的事务性查询缓存机制，它可以非常方便地配置和定制； 
+- 为了使它更加强大而且易于配置，我们对 MyBatis 3 中的缓存实现进行了许多改进；
+- MyBatis系统中默认定义了两级缓存：一级缓存和二级缓存；
+  - 默认情况下，只启用了本地的会话缓存（也叫一级缓存，是SqlSession级别的缓存），它仅仅对一个会话中的数据进行缓存；
+  - 二级缓存需要手动开启配置，是基于namespace级别的缓存；
+  - 为了提高扩展性，MyBatis定义了缓存接口Cache；我们可以通过实现Cache接口来自定义二级缓存；
 
+### 13.2 一级缓存
 
+- 一级缓存也叫本地缓存：SqlSession
+  - 与数据库同一次会话期间查询到的数据会放在本地缓存中；
+  - 如果需要获取相同的数据，直接从缓存中拿走即可，没必要再到数据库中查询；
+
+- 测试：开启日志，测试在一个session中查询两次相同的记录，查看日志输出情况；
+
+![image-20200928134104441](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200928134104441.png)
+
+- 缓存失效的情况：
+
+  - 查询不同的数据；
+  - 增删改操作可能会改变数据库中原来的数据，所以必定会刷新缓存；
+
+  ![image-20200928135032977](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200928135032977.png)
+
+  - 查询不同的mapper.xml；
+  - 手动清理缓存；；
+
+```java
+sqlSession.clearCache();    // 手动清理缓存
+```
+
+![image-20200928135637423](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200928135637423.png)
+
+- 小结：一级缓存默认是开启的只在一次SqlSession中有效，也就是拿到连接到关闭连接的这个过程有效；
+
+### 13.3 二级缓存
+
+- 二级缓存也叫全局缓存，一级缓存的作用域太低了，所以诞生了二级缓存；
+
+- 基于namespace级别的缓存，一个命名空间对应一个二级缓存；
+
+- 工作机制：
+
+  - 一个会话查询一条数据，这个数据就会被放在当前会话的以及缓存中；
+  - 如果当前会话关闭了，这个会话对应的一级缓存就没有了，但是我们想要的是，会话关闭时对应一级缓存中的数据被保存到二级缓存中；
+  - 新的会话查询信息，就可以从二级缓存中获取内容；
+  - 不同的mapper查出的数据会放在自己对应的缓存中；
+
+- 步骤：
+
+  - 开启全局缓存；
+
+  ```xml
+  <!--显示的开启全局缓存-->
+  <setting name="cacheEnabled" value="true"/>
+  ```
+
+  - 在mapper.xml中开启二级缓存
+
+  ```xml
+  <!--开启二级缓存-->
+  <cache/>
+  <!--自定义二级缓存-->
+  <cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"/>
+  ```
+
+  - 测试
+
+  ![image-20200928143656289](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200928143656289.png)
+
+- 注意：我们需要将实体类序列化！否则可能会报错！
+
+```java
+Caused by: java.io.NotSerializableException: com.longg.pojo.User
+```
+
+​		**序列化的方法：**
+
+![image-20200928143936717](C:\Users\A80024\AppData\Roaming\Typora\typora-user-images\image-20200928143936717.png)
+
+- 小结：
+  - 只要开启了二级缓存，在同一个mapper下就会有效；
+  - 所有的数据都会先放在一级缓存中；
+  - 只有当会话提交，或者关闭的时候，才会被提交到二级缓存中；
+
+### 13.4 缓存的原理【重点】
+
+- 一级缓存只要Sqlsession会话建立即随之建立，SqlSession在数据库中查询的书籍会自动保存在一级缓存中，第二次查询的时候直接在一级缓存中取出即可，在SqlSession被关闭的时候一级缓存也就随之关闭了；【一级缓存对应SqlSession】
+- 二级缓存在同一个mapper下都能生效，再SqlSession建立时所有的查询数据都会先放在一级缓存中，只有当会话被关闭的时候，一级缓存内的数据才能被保存到二级缓存中，之后的查询都能在二级缓存中去取对应的数据；【二级缓存对应一个mapper】
+- 数据存放的顺序：数据库、一级缓存、二级缓存；
+- 用户查询缓存的顺序：用户先在二级缓存中是否有，没有则进入一级缓存中找是否有，最后才进入数据库中查询；【与数据存放的顺序相反】
+
+![img](https://img-blog.csdnimg.cn/20200623165404113.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0RERERlbmdf,size_16,color_FFFFFF,t_70#pic_center)
+
+### 13.5 自定义缓存（EhCache）
+
+**==EhCache 是一个纯Java的进程内缓存框架，具有快速、精干等特点，是Hibernate中默认的CacheProvider。==**
 
 
 

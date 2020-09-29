@@ -5,10 +5,7 @@ import com.longg.utils.MybatisUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author long
@@ -168,14 +165,20 @@ public class BlogMapperTest {
 
         BlogMapper mapper = sqlSession.getMapper(BlogMapper.class);
 
+        // Map传参
         HashMap map = new HashMap();
 
+        // List传参
         ArrayList<Integer> ids = new ArrayList<Integer>();
         ids.add(1);
         ids.add(2);
         ids.add(3);
 
         map.put("ids",ids);
+
+        // 数组传参
+        int[] arrayId = new int[]{1,2,3};
+        System.out.println(Arrays.toString(arrayId));
 
         List<Blog> blogs = mapper.queryBlogForeach(map);
         for (Blog blog : blogs) {
